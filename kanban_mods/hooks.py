@@ -19,7 +19,7 @@ email_brand_image = "/files/Kanban_logo_large.png"
 # Apps
 # ------------------
 
-required_apps = ["erpnext"]
+required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
