@@ -19,7 +19,7 @@ email_brand_image = "/files/Kanban_logo_large.png"
 # Apps
 # ------------------
 
-required_apps = []
+# required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
 # add_to_apps_screen = [
@@ -75,6 +75,19 @@ required_apps = []
 # 	"Role": "home_page"
 # }
 
+# Routing Rules
+
+website_route_rules = [
+{"from_route": "/quotations", "to_route": "Quotation"},
+	{
+		"from_route": "/quotations/<path:name>",
+		"to_route": "order",
+		"defaults": {
+			"doctype": "Quotation",
+			"parents": [{"label": "Quotations", "route": "quotations"}],
+		},
+	},
+]
 # Generators
 # ----------
 

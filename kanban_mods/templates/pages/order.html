@@ -29,24 +29,37 @@
 				{% endif %}
 				<a class="dropdown-item"
 					href='/printview?doctype={{ doc.doctype}}&name={{ doc.name }}&format={{ print_format }}' target="_blank"
-					rel="noopener noreferrer">
+						rel="noopener noreferrer">
 					{{ _("Print") }}
 				</a>
+				{% if show_pay_button %}
+					<div class="form-column col-sm-6">
+						<div class="page-header-actions-block" data-html-block="header-actions">
+							<p>
+								<a href="/api/method/erpnext.accounts.doctype.payment_request.payment_request.make_payment_request?dn={{ doc.name }}&dt={{ doc.doctype }}&submit_doc=1&order_type=Shopping Cart"
+									class="btn btn-primary btn-sm" id="pay-for-order">
+									{{ _("Pay") }} {{doc.get_formatted("grand_total") }}
+								</a>
+							</p>
+						</div>
+					</div>
+				{% endif %}
+				{%  if doc.doctype == 'Quotation' and (doc.status == "Open")  %}
+					<div class="form-column col-sm-6">
+						<div class="page-header-actions-block" data-html-block="header-actions">
+							<p>
+								<a href="/api/method/kanban_mods.selling.doctype.quotation.quotation.make_sales_order_from_portal?source_name={{ doc.name }}"
+									class="btn btn-primary btn-sm" id="accept-quotation">
+										{{ _("Accept") }}
+								</a>
+							</p>
+						</div>
+					</div>
+				{% endif %}
 			</ul>
 		</div>
-		{% if show_pay_button %}
-			<div class="form-column col-sm-6">
-				<div class="page-header-actions-block" data-html-block="header-actions">
-					<p>
-						<a href="/api/method/erpnext.accounts.doctype.payment_request.payment_request.make_payment_request?dn={{ doc.name }}&dt={{ doc.doctype }}&submit_doc=1&order_type=Shopping Cart"
-							class="btn btn-primary btn-sm" id="pay-for-order">
-							{{ _("Pay") }} {{doc.get_formatted("grand_total") }}
-						</a>
-					</p>
-				</div>
-			</div>
-		{% endif %}
 	</div>
+
 {% endblock %}
 
 {% block page_content %}

@@ -336,8 +336,18 @@ def get_list_context(context=None):
 	return list_context
 
 
-@frappe.whitelist()
-def make_sales_order(source_name: str, target_doc=None):
+def make_sales_order_from_portal(source_name):
+	doc = make_sales_order(source_name, None, True)
+#	if doc.contact_email != frappe.session.user:
+#		frappe.throw(_("Not Permitted"), frappe.PermissionError)
+	doc.delivery_date =  frappe.utils.data.add_to_date(doc.transaction_date, 14)
+	doc.save()
+	frappe.db.commit() 
+
+	frappe.response["type"] = "redirect"
+	frappe.response.location = "/orders/" + doc.name
+
+def make_sales_order(source_name: str, target_doc=None, ignore_permissions = False):
 	if not frappe.db.get_singles_value(
 		"Selling Settings", "allow_sales_order_creation_for_expired_quotation"
 	):
@@ -349,8 +359,7 @@ def make_sales_order(source_name: str, target_doc=None):
 		):
 			frappe.throw(_("Validity period of this quotation has ended."))
 
-	return _make_sales_order(source_name, target_doc)
-
+	return _make_sales_order(source_name, target_doc, ignore_permissions)
 
 def _make_sales_order(source_name, target_doc=None, ignore_permissions=False):
 	customer = _make_customer(source_name, ignore_permissions)
