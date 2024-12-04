@@ -335,17 +335,18 @@ def get_list_context(context=None):
 
 	return list_context
 
-
 def make_sales_order_from_portal(source_name):
 	doc = make_sales_order(source_name, None, True)
-#	if doc.contact_email != frappe.session.user:
-#		frappe.throw(_("Not Permitted"), frappe.PermissionError)
+	if doc.contact_email != frappe.session.user:
+		frappe.throw(_("Not Permitted"), frappe.PermissionError)
 	doc.delivery_date =  frappe.utils.data.add_to_date(doc.transaction_date, 14)
 	doc.save()
 	frappe.db.commit() 
 
 	frappe.response["type"] = "redirect"
 	frappe.response.location = "/orders/" + doc.name
+	frappe.response.location = "/orders/"
+	return source_name
 
 def make_sales_order(source_name: str, target_doc=None, ignore_permissions = False):
 	if not frappe.db.get_singles_value(
