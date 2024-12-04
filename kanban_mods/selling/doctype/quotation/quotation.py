@@ -337,12 +337,22 @@ def get_list_context(context=None):
 
 @frappe.whitelist()
 def make_sales_order_from_portal(source_name):
+	## create the new sales order object
 	doc = make_sales_order(source_name, None, True)
+	## Make sure again of the user's identity
 	if doc.owner != frappe.session.user:
 		frappe.throw(_("Not Permitted"), frappe.PermissionError)
+	## These fields aren't set automatically si l\ets make sure they are
 	doc.delivery_date =  frappe.utils.data.add_days(doc.transaction_date, 21)
+	order_name = doc.name
 	doc.save()
 	frappe.db.commit() 
+	## Now I need to make sure the original quotation doesn't allow for
+	## the user to accept it a second time ... 
+	frappe.db.set_value('Quotation', source_name, 'status', 'Ordered')
+	frappe.db.set_value('Sales Order', order_name, 'status', 'To Deliver and Bill')
+	frappe.db.commit() 
+
 	frappe.response["type"] = "redirect"
 	frappe.response.location = "/orders/" + doc.name
 
