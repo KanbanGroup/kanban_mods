@@ -335,19 +335,19 @@ def get_list_context(context=None):
 
 	return list_context
 
+@frappe.whitelist()
 def make_sales_order_from_portal(source_name):
-	doc = make_sales_order(source_name, None, True)
-	if doc.contact_email != frappe.session.user:
-		frappe.throw(_("Not Permitted"), frappe.PermissionError)
-	doc.delivery_date =  frappe.utils.data.add_to_date(doc.transaction_date, 14)
-	doc.save()
-	frappe.db.commit() 
-
-	frappe.response["type"] = "redirect"
-	frappe.response.location = "/orders/" + doc.name
-	frappe.response.location = "/orders/"
+#	doc = make_sales_order(source_name, None, True)
+#	if doc.contact_email != frappe.session.user:
+#		frappe.throw(_("Not Permitted"), frappe.PermissionError)
+#	doc.delivery_date =  frappe.utils.data.add_to_date(doc.transaction_date, 14)
+#	doc.save()
+#	frappe.db.commit() 
+#	frappe.response["type"] = "redirect"
+#	frappe.response.location = "/orders/" + doc.name
 	return source_name
 
+@frappe.whitelist()
 def make_sales_order(source_name: str, target_doc=None, ignore_permissions = False):
 	if not frappe.db.get_singles_value(
 		"Selling Settings", "allow_sales_order_creation_for_expired_quotation"
@@ -454,6 +454,7 @@ def _make_sales_order(source_name, target_doc=None, ignore_permissions=False):
 	return doclist
 
 
+@frappe.whitelist()
 def set_expired_status():
 	# filter out submitted non expired quotations whose validity has been ended
 	cond = "`tabQuotation`.docstatus = 1 and `tabQuotation`.status NOT IN ('Expired', 'Lost') and `tabQuotation`.valid_till < %s"
@@ -518,6 +519,7 @@ def _make_sales_invoice(source_name, target_doc=None, ignore_permissions=False):
 	return doclist
 
 
+@frappe.whitelist()
 def _make_customer(source_name, ignore_permissions=False):
 	quotation = frappe.db.get_value(
 		"Quotation",
@@ -548,6 +550,7 @@ def _make_customer(source_name, ignore_permissions=False):
 	return None
 
 
+@frappe.whitelist()
 def create_customer_from_lead(lead_name, ignore_permissions=False):
 	from erpnext.crm.doctype.lead.lead import _make_customer
 
@@ -561,6 +564,7 @@ def create_customer_from_lead(lead_name, ignore_permissions=False):
 		handle_mandatory_error(e, customer, lead_name)
 
 
+@frappe.whitelist()
 def create_customer_from_prospect(prospect_name, ignore_permissions=False):
 	from erpnext.crm.doctype.prospect.prospect import make_customer as make_customer_from_prospect
 
