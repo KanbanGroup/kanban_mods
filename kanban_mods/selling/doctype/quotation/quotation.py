@@ -346,6 +346,7 @@ def make_sales_order_from_portal(source_name):
 	doc.delivery_date =  frappe.utils.data.add_days(doc.transaction_date, 21)
 	order_name = doc.name
 	doc.status = 'To Deliver and Bill'
+	doc.custom_by_web = 1
 	doc.save()
 	frappe.db.commit() 
 	## Now I need to make sure the original quotation doesn't allow for

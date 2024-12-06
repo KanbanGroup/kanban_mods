@@ -6,14 +6,14 @@ app_email = "kevin@sound-and-spirit.nl"
 app_license = "GNU General Public License (v3)"
 app_icon = "fa fa-th"
 app_color = "#e74c3c"
-app_logo_url = "/files/Kanban_logo_large.png"
+app_logo_url = "/files/Kanban_logo_large_DEV.png"
 
 website_context = {
     "favicon": "/assets/erpnext/images/erpnext-favicon.svg",
 #   "splash_image": "/assets/erpnext/images/erpnext-logo.png",
-    "splash_image": "/files/Kanban_logo_large.png",
+    "splash_image": "/files/Kanban_logo_large_DEV.png",
 }
-email_brand_image = "/files/Kanban_logo_large.png"
+email_brand_image = "/files/Kanban_logo_large_DEV.png"
 
 
 # Apps
