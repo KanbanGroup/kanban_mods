@@ -36,7 +36,7 @@ email_brand_image = "/files/Kanban_logo_large_DEV.png"
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/kanban_mods/css/kanban_mods.css"
+app_include_css = "/assets/kanban_mods/scss/desk/desktop.scss"
 # app_include_js = "/assets/kanban_mods/js/kanban_mods.js"
 
 # include js, css files in header of web template
@@ -44,7 +44,7 @@ email_brand_image = "/files/Kanban_logo_large_DEV.png"
 # web_include_js = "/assets/kanban_mods/js/kanban_mods.js"
 
 # include custom scss in every website theme (without file extension ".scss")
-# website_theme_scss = "kanban_mods/public/scss/website"
+website_theme_scss = "kanban_mods/public/scss/website"
 
 # include js, css files in header of web form
 # webform_include_js = {"doctype": "public/js/doctype.js"}
