@@ -1,0 +1,14 @@
+{% extends "templates/web.html" %}
+{% from "erpnext/templates/includes/macros.html" import product_image %}
+
+{% block breadcrumbs %}
+	{% include "templates/includes/breadcrumbs.html" %}
+{% endblock %}
+
+
+{% block page_content %}
+<div>
+<h2>Client RFQ</h2>
+<h4>{{message}}</h4>
+</div>
+{% endblock %}

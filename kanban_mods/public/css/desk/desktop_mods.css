@@ -1,0 +1,15 @@
+.quick-list-widget-box {
+    border: 1px solid #808080;
+}
+
+.links-widget-box {
+	border: 1px solid #808080;
+}
+
+.widget-head {
+	border-bottom: 1px solid #808080;
+}
+
+.shortcut-widget-box .widget-head {
+		border: none;
+}
