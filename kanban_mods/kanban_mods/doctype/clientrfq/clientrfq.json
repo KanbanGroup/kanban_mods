@@ -1,8 +1,10 @@
 {
  "actions": [],
+ "allow_guest_to_view": 1,
  "allow_import": 1,
- "autoname": "naming_series:",
+ "autoname": "naming_series:naming_series",
  "creation": "2024-12-14 18:41:03.535981",
+ "default_view": "List",
  "doctype": "DocType",
  "document_type": "Document",
  "engine": "InnoDB",
@@ -23,7 +25,6 @@
   "email_template",
   "preview",
   "col_break_email_1",
-  "html_llwp",
   "send_attached_files",
   "send_document_print",
   "sec_break_email_2",
@@ -41,9 +42,9 @@
  ],
  "fields": [
   {
+   "default": "SAL-CRFQ-.YYYY.-",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "in_list_view": 1,
    "label": "Series",
    "no_copy": 1,
    "oldfieldname": "naming_series",
@@ -67,6 +68,7 @@
    "search_index": 1
   },
   {
+   "fetch_from": "company.customer_primary_address",
    "fieldname": "billing_address",
    "fieldtype": "Link",
    "label": "Company Billing Address",
@@ -112,13 +114,14 @@
    "label": "Required Date"
   },
   {
+   "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "\nDraft\nSubmitted\nCancelled",
+   "options": "Draft\nSubmitted\nCancelled",
    "print_hide": 1,
    "read_only": 1,
    "reqd": 1,
@@ -171,14 +174,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "html_llwp",
-   "fieldtype": "HTML",
-   "options": "<p>In your <b>Email Template</b>, you can use the following special variables:\n</p>\n<ul>\n        <li>\n            <code>{{ update_password_link }}</code>: A link where your supplier can set a new password to log into your portal.\n        </li>\n        <li>\n            <code>{{ portal_link }}</code>: A link to this RFQ in your supplier portal.\n        </li>\n        <li>\n            <code>{{ supplier_name }}</code>: The company name of your supplier.\n        </li>\n        <li>\n            <code>{{ contact.salutation }} {{ contact.last_name }}</code>: The contact person of your supplier.\n        </li><li>\n            <code>{{ user_fullname }}</code>: Your full name.\n        </li>\n    </ul>\n<p></p>\n<p>Apart from these, you can access all values in this RFQ, like <code>{{ message_for_supplier }}</code> or <code>{{ terms }}</code>.</p>",
-   "print_hide": 1,
-   "read_only": 1,
-   "report_hide": 1
-  },
-  {
    "default": "1",
    "description": "If enabled, all files attached to this document will be attached to each email",
    "fieldname": "send_attached_files",
@@ -196,8 +191,7 @@
   {
    "depends_on": "eval:!doc.__islocal",
    "fieldname": "sec_break_email_2",
-   "fieldtype": "Section Break",
-   "hide_border": 1
+   "fieldtype": "Section Break"
   },
   {
    "allow_on_submit": 1,
@@ -205,10 +199,8 @@
    "fetch_if_empty": 1,
    "fieldname": "message_for_supplier",
    "fieldtype": "Text Editor",
-   "in_list_view": 1,
    "label": "Message for Supplier",
-   "print_hide": 1,
-   "reqd": 1
+   "print_hide": 1
   },
   {
    "collapsible": 1,
@@ -267,6 +259,7 @@
   },
   {
    "allow_on_submit": 1,
+   "default": "New_Kanban_Letterhead",
    "fieldname": "letter_head",
    "fieldtype": "Link",
    "label": "Letter Head",
@@ -294,10 +287,9 @@
   }
  ],
  "icon": "fa fa-shopping-cart",
- "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-14 18:55:03.457081",
+ "modified": "2024-12-15 15:28:49.065179",
  "modified_by": "Administrator",
  "module": "Kanban Mods",
  "name": "ClientRFQ",
@@ -348,5 +340,6 @@
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "title"
 }

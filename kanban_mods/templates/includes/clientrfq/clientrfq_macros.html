@@ -14,10 +14,10 @@
 		<div class="col-9">
 			{{ d.item_code }}
 			<p class="text-muted small">{{ d.description }}</p>
-			{% set supplier_part_no = frappe.db.get_value("Item Supplier", {'parent': d.item_code, 'supplier': doc.supplier}, "supplier_part_no") %}
+			{% set item_group = frappe.db.get_value("Item Supplier", {'parent': d.item_code, 'supplier': doc.supplier}, "item_group") %}
 			<p class="text-muted small supplier-part-no">
 				{% if supplier_part_no %}
-					{{_("Supplier Part No") + ": "+ supplier_part_no}}
+					{{_("Idem Group") + ": "+ item_group}}
 				{% endif %}
 			</p>
 		</div>
