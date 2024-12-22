@@ -15,7 +15,7 @@ def get_context(context):
 	context.doc = frappe.get_doc(frappe.form_dict.doctype, frappe.form_dict.name)
 	if hasattr(context.doc, "set_indicator"):
 		context.doc.set_indicator()
-
+	print(frappe.has_website_permission(context.doc))
 	context.parents = frappe.form_dict.parents
 	context.title = frappe.form_dict.name
 	context.payment_ref = frappe.db.get_value(
@@ -55,6 +55,7 @@ def get_context(context):
 		and frappe.db.get_single_value("Buying Settings", "show_pay_button")
 		and context.doc.doctype in ALLOWED_DOCTYPES_FOR_PAYMENT_REQUEST
 	)
+
 	context.show_make_pi_button = False
 	if context.doc.get("supplier"):
 		# show Make Purchase Invoice button based on permission

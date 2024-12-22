@@ -101,5 +101,41 @@ class ClientRFQ(Document):
 
 def get_context(context):
     clientrfq_name = frappe.form_dict.name
-    clientrfq = frappe.get_doc("PrClientRFQ", pclientrfq_name)
+    clientrfq = frappe.get_doc("ClientRFQ", clientrfq_name)
     context.clientrfq = clientrfq
+
+def get_list_context(context=None):
+	from kanban_mods.kanban_mods.controllers.website_list_for_contact import get_list_context
+
+	list_context = get_list_context(context)
+	list_context.update(
+		{
+			"show_sidebar": True,
+			"show_search": True,
+			"no_breadcrumbs": True,
+			"title": _("Client Requests for Quotations"),
+		}
+	)
+	return list_context
+
+
+def get_list(source_name):
+
+	doclist = get_mapped_doc(
+		"ClientRFQ",
+		source_name,
+		{
+			"ClientRFQ": {"doctype": "ClientRFQ", "validation": {"docstatus": ["=", 1]}},
+			"ClientRFQ Item": {
+				"doctype": "ClientRFQ Item",
+				"field_map": {"parent": "prevdoc_docname", "name": "clientrfcq_item"},
+				"postprocess": update_item,
+				"condition": can_map_row,
+			},
+		},
+		target_doc,
+		set_missing_values,
+		ignore_permissions=ignore_permissions,
+	)
+
+	return doclist

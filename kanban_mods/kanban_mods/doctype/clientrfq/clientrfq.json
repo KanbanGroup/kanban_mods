@@ -289,7 +289,7 @@
  "icon": "fa fa-shopping-cart",
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-15 15:28:49.065179",
+ "modified": "2024-12-22 11:50:47.208238",
  "modified_by": "Administrator",
  "module": "Kanban Mods",
  "name": "ClientRFQ",
@@ -306,6 +306,7 @@
    "read": 1,
    "report": 1,
    "role": "Sales Master Manager",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1
@@ -320,6 +321,7 @@
    "read": 1,
    "report": 1,
    "role": "Sales Manager",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1
@@ -332,6 +334,7 @@
    "read": 1,
    "report": 1,
    "role": "Customer",
+   "select": 1,
    "share": 1,
    "write": 1
   }
@@ -341,5 +344,5 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "title"
+ "track_changes": 1
 }

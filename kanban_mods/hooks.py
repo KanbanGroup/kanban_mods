@@ -77,19 +77,26 @@ app_include_css = [
 # 	"Role": "home_page"
 # }
 
-
+webform_list_context = "kanban_mods.kanban_mods.controllers.website_list_for_contact.get_webform_list_context"
+webform_transaction_list = "kanban_mods.kanban_mods.controllers.website_list_for_contact.get_webform_transaction_list"
+get_list = "kanban_mods.kanban_mods.controllers.website_list_for_contact.get_transaction_list"
+has_website_permission = {
+	"ClientRFQ": "kanban_mods.kanban_mods.controllers.website_list_for_contact.has_website_permission",
+}
 # Routing Rules
 
 website_route_rules = [
 {"from_route": "/quotations", "to_route": "Quotation"},
-	{
-		"from_route": "/quotations/<path:name>",
-		"to_route": "order",
-		"defaults": {
-			"doctype": "Quotation",
-			"parents": [{"label": "Quotations", "route": "quotations"}],
-		},
-	},
+
+{"from_route": "/quotations/<path:name>", "to_route": "order",
+	"defaults": {"doctype": "Quotation", "parents": [{"label": "Quotations", "route": "quotations"}],},
+},
+    
+{"from_route": "/clientrfq", "to_route": "ClientRFQ"},
+
+{"from_route": "/clientrfq/<path:name>", "to_route": "clientrfq",
+	"defaults": {"doctype": "ClientRFQ","parents": [{"label": "ClientRFQ", "route": "ClientRFQ"}],}
+}
 ]
 # Generators
 # ----------
