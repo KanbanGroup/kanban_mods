@@ -6,14 +6,14 @@ app_email = "kevin@sound-and-spirit.nl"
 app_license = "GNU General Public License (v3)"
 app_icon = "fa fa-th"
 app_color = "#e74c3c"
-app_logo_url = "/files/Kanban_logo_large_DEV.png"
+app_logo_url = "/files/Kanban_logo_large.png"
 
 website_context = {
     "favicon": "/assets/erpnext/images/erpnext-favicon.svg",
 #   "splash_image": "/assets/erpnext/images/erpnext-logo.png",
-    "splash_image": "/files/Kanban_logo_large_DEV.png",
+    "splash_image": "/files/Kanban_logo_large.png",
 }
-email_brand_image = "/files/Kanban_logo_large_DEV.png"
+email_brand_image = "/files/Kanban_logo_large.png"
 
 
 # Apps
@@ -174,7 +174,35 @@ website_route_rules = [
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
+    "cron": {
+        # 15 minutes
+        "0/15 * * * *": [
+            "frappe.oauth.delete_oauth2_data",
+            "frappe.website.doctype.web_page.web_page.check_publish_status",
+            "frappe.twofactor.delete_all_barcodes_for_users",
+            "frappe.email.doctype.email_account.email_account.notify_unreplied",
+            "frappe.utils.global_search.sync_global_search",
+            "frappe.deferred_insert.save_to_db",
+        ],
+        # 10 minutes
+        "0/2 * * * *": [
+            "frappe.email.doctype.email_account.email_account.pull",
+        ],
+        # Hourly but offset by 30 minutes
+        "30 * * * *": [
+            "frappe.core.doctype.prepared_report.prepared_report.expire_stalled_report",
+        ],
+        # Daily but offset by 45 minutes
+        "45 0 * * *": [
+            "frappe.core.doctype.log_settings.log_settings.run_log_clean_up",
+        ],
+    },
+#    "cron": [
+#        "0/3 * * * *": [
+#            "frappe.email.doctype.email_account.email_account.pull",
+#        ],
+#    ],
 # 	"all": [
 # 		"kanban_mods.tasks.all"
 # 	],
@@ -189,8 +217,7 @@ website_route_rules = [
 # 	],
 # 	"monthly": [
 # 		"kanban_mods.tasks.monthly"
-# 	],
-# }
+}
 
 # Testing
 # -------
