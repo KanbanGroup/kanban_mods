@@ -1,0 +1,25 @@
+
+{% if doc.status == "Draft" -%}
+	{% set status_colour = "orange" -%}
+{% elif doc.status == "Submitted" -%}
+	{% set status_colour = "green" -%}
+{% else -%}
+	{% set status_colour = "gray" -%}
+{% endif %}
+<div class="row">
+	<div class="col-sm-4 col-xs-6">
+		<a href="/clientrfq/{{ doc.name }}">{{ doc.title or doc.name }}</a> 
+	</div>
+	<div class="col-sm-2 col-xs-4 text-right">
+		<span class="indicator-pill {{status_colour}} filterable no-indicator-dot ellipsis">{{ doc.status }}</span>
+	</div>	
+	<div class="col-sm-2 col-xs-4 text-right">
+		{{ doc.transaction_date}} 
+	</div>
+	<div class="col-sm-2 col-xs-4 text-right">
+		{{ doc.schedule_date}}
+	</div>	
+</div>
+
+
+<!-- this is a sample default list template -->
