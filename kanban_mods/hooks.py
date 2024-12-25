@@ -89,6 +89,7 @@ website_route_rules = [
 			"parents": [{"label": "Quotations", "route": "quotations"}],
 		},
 	},
+{"from_route": "/clientrfq", "to_route": "ClientRFQ"},
 ]
 # Generators
 # ----------

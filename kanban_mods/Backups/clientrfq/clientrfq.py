@@ -14,9 +14,9 @@ from frappe.utils.user import get_user_fullname
 from frappe.model.document import Document
 
 from erpnext.accounts.party import get_party_account_currency, get_party_details
-#from erpnext.selling.utils import validate_for_items
+from erpnext.selling.utils import validate_for_items
 
-#from erpnext.controllers.selling_controller import SellingController
+from erpnext.controllers.selling_controller import SellingController
 #from kanban_mods.controllers.clientrfq.clientrfq_controller import ClientRFQController
 
 form_grid_templates = {"items": "templates/form_grid/item_grid.html"}
@@ -42,7 +42,8 @@ class ClientRFQ(Document):
 		amended_from: DF.Link | None
 		billing_address: DF.link | None
 		billing_address_display: DF.SmallText | None
-		client: DF.Link
+		company: DF.Link
+		customer: DF.Link
 		email_template: DF.Link 
 		incoterm: DF.Link | None
 		items: DF.Table[ClientRFQ_Item]
@@ -63,7 +64,7 @@ class ClientRFQ(Document):
 		doctype: DF.Link | "ClientRFQ"
 
 	def set_initial_values(self):
-		self.email_template = "CustRFQ_email"
+		self.email_template = "CustRFC_email"
 		self.letter_head = "New_Kanban_Letterhead"
 		self.naming_series = "SAL-CRFQ-.YYYY.-"
 		self.send_attached_files = 1
@@ -86,18 +87,17 @@ class ClientRFQ(Document):
 
 	def on_submit(self):
 		self.db_set("status", "Submitted")
-		self.send_to_client()
+		self.send_to_vendor()
 
-	def send_to_client(self):
-		client = self.client
-		print(client)
-		exit
-		if client.email_id is not None and client.send_email:
-			self.validate_email_id(client)
-			update_password_link, contact = self.update_supplier_contact(client, self.get_link())
-			self.supplier_rfq_mail(client, update_password_link, self.get_link())
-			client.email_sent = 1
-			client.save()
+	def send_to_vendor(self):
+		supplier = self.vendor
+		if supplier.email_id is not None and supplier.send_email:
+			self.validate_email_id(supplier)
+			update_password_link, contact = self.update_supplier_contact(supplier, self.get_link())
+			self.update_supplier_part_no(supplier.supplier)
+			self.supplier_rfq_mail(supplier, update_password_link, self.get_link())
+			supplier.email_sent = 1
+			supplier.save()
 
 def get_context(context):
     clientrfq_name = frappe.form_dict.name

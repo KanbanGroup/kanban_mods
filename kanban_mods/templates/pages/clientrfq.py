@@ -22,8 +22,8 @@ def get_context(context):
 		context.print_format = default_print_format
 	else:
 		context.print_format = "Standard"
-#	if not frappe.has_website_permission(context.doc):
-#		frappe.throw(_("Not Permitted"), frappe.PermissionError)
+	if not frappe.has_website_permission(context.doc):
+		frappe.throw(_("Not Permitted"), frappe.PermissionError)
 
 	context.available_loyalty_points = 0.0
 	context.show_pay_button = (False)
