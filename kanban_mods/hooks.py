@@ -92,10 +92,10 @@ website_route_rules = [
 {"from_route": "/clientrfq", "to_route": "ClientRFQ"},
 	{
 		"from_route": "/clientrfq/<path:name>",
-		"to_route": "oclientrfqrder",
+		"to_route": "clientrfq",
 		"defaults": {
-			"doctype": "ClientRFQn",
-			"parents": [{"label": "Client RFQ", "route": "qclientrfq"}],
+			"doctype": "ClientRFQ",
+			"parents": [{"label": "Client RFQ", "route": "clientrfq"}],
 		},
 	},
 ]
