@@ -126,7 +126,6 @@ def get_list_context(context=None):
 
 
 def get_list(source_name):
-	print("@@@@@@@@@@@@@@@@ Is this the missing link ??")
 	doclist = get_mapped_doc(
 		"ClientRFQ",
 		source_name,
