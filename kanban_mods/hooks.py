@@ -90,6 +90,14 @@ website_route_rules = [
 		},
 	},
 {"from_route": "/clientrfq", "to_route": "ClientRFQ"},
+	{
+		"from_route": "/clientrfq/<path:name>",
+		"to_route": "oclientrfqrder",
+		"defaults": {
+			"doctype": "ClientRFQn",
+			"parents": [{"label": "Client RFQ", "route": "qclientrfq"}],
+		},
+	},
 ]
 # Generators
 # ----------

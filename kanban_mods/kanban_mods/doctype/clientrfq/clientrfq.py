@@ -13,7 +13,7 @@ from frappe.utils.print_format import download_pdf
 from frappe.utils.user import get_user_fullname
 from frappe.model.document import Document
 
-from erpnext.accounts.party import get_party_account_currency, get_party_details
+#from erpnext.accounts.party import get_party_account_currency, get_party_details
 #from erpnext.selling.utils import validate_for_items
 
 #from erpnext.controllers.selling_controller import SellingController
@@ -89,15 +89,20 @@ class ClientRFQ(Document):
 		self.send_to_client()
 
 	def send_to_client(self):
-		client = self.client
-		print(client)
+		client = frappe.get_doc("Customer", self.client)
 		exit
-		if client.email_id is not None and client.send_email:
+		if client.email_id is not None:
 			self.validate_email_id(client)
-			update_password_link, contact = self.update_supplier_contact(client, self.get_link())
-			self.supplier_rfq_mail(client, update_password_link, self.get_link())
 			client.email_sent = 1
 			client.save()
+
+	def validate_email_id(self, args):
+		if not args.email_id:
+			frappe.throw(
+				("Row {0}: For Client {1}, Email Address is Required to send an email").format(
+					args.idx, frappe.bold(args.supplier)
+				)
+			)
 
 def get_context(context):
     clientrfq_name = frappe.form_dict.name
@@ -105,7 +110,8 @@ def get_context(context):
     context.clientrfq = clientrfq
 
 def get_list_context(context=None):
-	from kanban_mods.kanban_mods.controllers.website_list_for_contact import get_list_context
+
+	from kanban_mods.kanban_mods.controllers.website_list_for_clientrfc import get_list_context
 
 	list_context = get_list_context(context)
 	list_context.update(
@@ -120,7 +126,7 @@ def get_list_context(context=None):
 
 
 def get_list(source_name):
-
+	print("@@@@@@@@@@@@@@@@ Is this the missing link ??")
 	doclist = get_mapped_doc(
 		"ClientRFQ",
 		source_name,
@@ -131,7 +137,7 @@ def get_list(source_name):
 				"field_map": {"parent": "prevdoc_docname", "name": "clientrfcq_item"},
 				"postprocess": update_item,
 				"condition": can_map_row,
-			},
+			}
 		},
 		target_doc,
 		set_missing_values,

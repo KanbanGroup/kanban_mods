@@ -42,7 +42,6 @@ def get_webform_transaction_list(
 
 	if not filters:
 		filters = []
-	print(doctype)
 	meta = frappe.get_meta(doctype)
 
 	for d in meta.fields:
@@ -70,32 +69,20 @@ def get_transaction_list(
 	limit_page_length=20,
 	order_by="modified",
 	custom=False,
-):
+	):
 	user = frappe.session.user
 	ignore_permissions = False
 
 	if not filters:
 		filters = {}
 
-	filters["docstatus"] = ["<", "2"] if doctype in ["Supplier Quotation", "Purchase Invoice"] else 1
+	filters["docstatus"] = 1
 
-	if (user != "Guest" and is_website_user()) or doctype == "Request for Quotation":
-		parties_doctype = "Request for Quotation Supplier" if doctype == "Request for Quotation" else doctype
+	if (user != "Guest" and is_website_user()):
+		parties_doctype = doctype
 		# find party for this contact
 		customers, suppliers = get_customers_suppliers(parties_doctype, user)
-
 		if customers:
-			if doctype == "Quotation":
-				filters["quotation_to"] = "Customer"
-				filters["party_name"] = ["in", customers]
-			else:
-				filters["customer"] = ["in", customers]
-		elif suppliers:
-			filters["supplier"] = ["in", suppliers]
-		elif not custom:
-			return []
-
-		if doctype == "Request for Quotation":
 			parties = customers or suppliers
 			return rfq_transaction_list(parties_doctype, doctype, parties, limit_start, limit_page_length)
 
@@ -178,9 +165,9 @@ def get_list_for_transactions(
 
 def rfq_transaction_list(parties_doctype, doctype, parties, limit_start, limit_page_length):
 	data = frappe.db.sql(
-		"""select distinct parent as name, supplier from `tab{doctype}`
-			where supplier = '{supplier}' and docstatus=1  order by modified desc limit {start}, {len}""".format(
-			doctype=parties_doctype, supplier=parties[0], start=limit_start, len=limit_page_length
+		"""select distinct name, client from `tab{doctype}`
+			where client = '{client}' and docstatus=1  order by modified desc limit {start}, {len}""".format(
+			doctype=parties_doctype, client=parties[0], start=limit_start, len=limit_page_length
 		),
 		as_dict=1,
 	)
@@ -224,17 +211,18 @@ def get_customers_suppliers(doctype, user):
 	customers = []
 	suppliers = []
 	meta = frappe.get_meta(doctype)
-
-	customer_field_name = get_customer_field_name(doctype)
-
-	has_customer_field = meta.has_field(customer_field_name)
-	has_supplier_field = meta.has_field("supplier")
+	has_customer_field = meta.has_field("client")
+	has_supplier_field = meta.has_field("vendor")
 
 	if has_common(["Supplier", "Customer"], frappe.get_roles(user)):
 		suppliers = get_parents_for_user("Supplier")
 		customers = get_parents_for_user("Customer")
-	elif frappe.has_permission(doctype, "read", user=user):
-		customer_list = frappe.get_list("Customer")
+
+	elif frappe.has_permission(doctype, "read", None, user):
+		customers = get_parents_for_user("Customer")
+		customer_list = []
+		for name in customers:
+			customer_list.append(frappe.get_doc("Customer", name))
 		customers = suppliers = [customer.name for customer in customer_list]
 
 	return customers if has_customer_field else None, suppliers if has_supplier_field else None
@@ -274,10 +262,7 @@ def get_customer_filter(doc, customers):
 
 
 def get_customer_field_name(doctype):
-	if doctype == "Quotation":
-		return "party_name"
-	else:
-		return "customer"
+		return "client"
 
 
 def add_role_for_portal_user(portal_user, role):
