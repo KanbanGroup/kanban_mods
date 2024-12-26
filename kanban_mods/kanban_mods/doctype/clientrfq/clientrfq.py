@@ -12,12 +12,7 @@ from frappe.utils import get_url
 from frappe.utils.print_format import download_pdf
 from frappe.utils.user import get_user_fullname
 from frappe.model.document import Document
-
-#from erpnext.accounts.party import get_party_account_currency, get_party_details
-#from erpnext.selling.utils import validate_for_items
-
-#from erpnext.controllers.selling_controller import SellingController
-#from kanban_mods.controllers.clientrfq.clientrfq_controller import ClientRFQController
+from frappe.contacts.address_and_contact import load_address_and_contact
 
 form_grid_templates = {"items": "templates/form_grid/item_grid.html"}
 
@@ -105,14 +100,13 @@ class ClientRFQ(Document):
 			)
 
 def get_context(context):
-    clientrfq_name = frappe.form_dict.name
-    clientrfq = frappe.get_doc("ClientRFQ", clientrfq_name)
-    context.clientrfq = clientrfq
+	clientrfq_name = frappe.form_dict.name
+	clientrfq = frappe.get_doc("ClientRFQ", clientrfq_name)
+	context.clientrfq = clientrfq
 
 def get_list_context(context=None):
 
 	from kanban_mods.kanban_mods.controllers.website_list_for_clientrfc import get_list_context
-
 	list_context = get_list_context(context)
 	list_context.update(
 		{

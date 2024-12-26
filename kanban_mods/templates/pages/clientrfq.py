@@ -1,12 +1,14 @@
 
 import frappe
 from frappe import _
+from kanban_mods.kanban_mods.controllers.website_list_for_clientrfc import get_doc
 
 def get_context(context):
 	context.no_cache = 1
 	context.show_sidebar = True
 
-	context.doc = frappe.get_doc(frappe.form_dict.doctype, frappe.form_dict.name)
+	context.doc = get_doc(frappe.form_dict.doctype, frappe.form_dict.name)
+
 	if hasattr(context.doc, "set_indicator"):
 		context.doc.set_indicator()
 	context.parents = frappe.form_dict.parents
@@ -21,12 +23,12 @@ def get_context(context):
 		context.print_format = default_print_format
 	else:
 		context.print_format = "Standard"
-	if not frappe.has_website_permission(context.doc):
+	if not frappe.has_permission(context.doc):
 		frappe.throw(_("Not Permitted"), frappe.PermissionError)
 
-	context.available_loyalty_points = 0.0
-	context.show_pay_button = (False)
-	context.show_make_pi_button = False
+	#context.available_loyalty_points = 0.0
+	#context.show_pay_button = (False)
+	#context.show_make_pi_button = False
 
 def get_attachments(dt, dn):
 	return frappe.get_all(

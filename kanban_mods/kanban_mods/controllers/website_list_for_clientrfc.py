@@ -214,14 +214,15 @@ def get_customers_suppliers(doctype, user):
 	has_customer_field = meta.has_field("client")
 	has_supplier_field = meta.has_field("vendor")
 
-	if has_common(["Supplier", "Customer"], frappe.get_roles(user)):
-		suppliers = get_parents_for_user("Supplier")
-		customers = get_parents_for_user("Customer")
+	# if has_common(["Supplier", "Customer"], frappe.get_roles(user)):
+	# 	suppliers = get_parents_for_user("Supplier")
+	# 	customers = get_parents_for_user("Customer")
 
-	elif frappe.has_permission(doctype, "read", None, user):
+	if frappe.has_permission(doctype, "read", None, user):
 		customers = get_parents_for_user("Customer")
 		customer_list = []
 		for name in customers:
+			print(name)
 			customer_list.append(frappe.get_doc("Customer", name))
 		customers = suppliers = [customer.name for customer in customer_list]
 
@@ -286,3 +287,7 @@ def add_role_for_portal_user(portal_user, role):
 
 	user_doc.add_roles(role)
 	frappe.msgprint(_("Added {1} Role to User {0}.").format(frappe.bold(user_doc.name), role), alert=True)
+
+
+def get_doc(doctype, name):
+	return(frappe.get_doc(doctype, name))
