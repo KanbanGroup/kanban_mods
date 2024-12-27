@@ -95,7 +95,7 @@ class ClientRFQ(Document):
 		if not args.email_id:
 			frappe.throw(
 				("Row {0}: For Client {1}, Email Address is Required to send an email").format(
-					args.idx, frappe.bold(args.supplier)
+					args.idx, frappe.bold(args.vendor)
 				)
 			)
 
