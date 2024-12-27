@@ -58,7 +58,7 @@ class ClientRFQ(Document):
 		doctype: DF.Link | "ClientRFQ"
 
 	def set_initial_values(self):
-		self.email_template = "CustRFQ_email"
+		self.email_template = "CustRFQ_Email"
 		self.letter_head = "New_Kanban_Letterhead"
 		self.naming_series = "SAL-CRFQ-.YYYY.-"
 		self.send_attached_files = 1
@@ -85,11 +85,24 @@ class ClientRFQ(Document):
 
 	def send_to_client(self):
 		client = frappe.get_doc("Customer", self.client)
-		exit
 		if client.email_id is not None:
 			self.validate_email_id(client)
+			self.rfq_mail(client)
+
 			client.email_sent = 1
 			client.save()
+
+	def get_link(self):
+		# RFQ link for suppliecustomerr portal
+		route = frappe.db.get_value(
+			"Portal Menu Item", {"reference_doctype": "ClientRFQ"}, ["route"]
+		)
+		if not route:
+			frappe.throw(_("Please add Client RFQs the sidebar in Portal Settings."))
+
+		return get_url(f"{route}/{self.name}")
+
+
 
 	def validate_email_id(self, args):
 		if not args.email_id:
@@ -98,6 +111,79 @@ class ClientRFQ(Document):
 					args.idx, frappe.bold(args.email_id)
 				)
 			)
+	
+	def rfq_mail(self, client, preview=False):
+		full_name = get_user_fullname(client.email_id) #### THS IS WRONG .. I WANT THE CLIENT CONTACT
+		if full_name == "Guest":
+			full_name = "Administrator"
+
+		doc_args = self.as_dict()
+
+		if client.get("contact"):
+			contact = frappe.get_doc("Contact", client.get("email_id"))
+			doc_args["contact"] = contact.as_dict()
+
+		doc_args.update(
+			{
+				"vendor": client.get("vendor"),
+				"vendor_name": client.get("vendor_name"),
+				"contact_name": full_name,
+			}
+		)
+
+		if not self.email_template:
+			return
+
+		email_template = frappe.get_doc("Email Template", self.email_template)
+		message = frappe.render_template(email_template.response_, doc_args)
+		subject = frappe.render_template(email_template.subject, doc_args)
+		sender = frappe.session.user not in STANDARD_USERS and frappe.session.user or None
+
+		if preview:
+			return {"message": message, "subject": subject}
+
+		attachments = []
+		
+		if self.send_attached_files:
+			attachments = self.get_attachments()
+
+		if self.send_document_print:
+			supplier_language = frappe.db.get_value("Supplier", data.supplier, "language")
+			system_language = frappe.db.get_single_value("System Settings", "language")
+			attachments.append(
+				frappe.attach_print(
+					self.doctype,
+					self.name,
+					doc=self,
+					print_format=self.meta.default_print_format or "Standard",
+					lang=supplier_language or system_language,
+					letterhead=self.letter_head,
+				)
+			)
+
+		print("############# Well we got this far !! #############")
+		print(client, sender, subject, message)
+		exit()
+
+		self.send_email(data, sender, subject, message, attachments)
+
+	def send_email(self, data, sender, subject, message, attachments):
+		exit()
+		make(
+			subject=subject,
+			content=message,
+			recipients=data.email_id,
+			sender=sender,
+			attachments=attachments,
+			send_email=True,
+			doctype=self.doctype,
+			name=self.name,
+		)["name"]
+
+		frappe.msgprint(_("Email Sent to Supplier {0}").format(data.supplier))
+
+
+
 
 def get_context(context):
 	clientrfq_name = frappe.form_dict.name
