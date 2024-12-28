@@ -83,15 +83,6 @@ class ClientRFQ(Document):
 		self.db_set("status", "Submitted")
 		self.send_to_client()
 
-	def send_to_client(self):
-		client = frappe.get_doc("Customer", self.client)
-		if client.email_id is not None:
-			self.validate_email_id(client)
-			self.rfq_mail(client)
-
-			client.email_sent = 1
-			client.save()
-
 	def get_link(self):
 		# RFQ link for suppliecustomerr portal
 		route = frappe.db.get_value(
@@ -102,7 +93,14 @@ class ClientRFQ(Document):
 
 		return get_url(f"{route}/{self.name}")
 
+	def send_to_client(self):
+		client = frappe.get_doc("Customer", self.client)
+		if client.email_id is not None:
+			self.validate_email_id(client)
 
+			self.rfq_mail(client)
+			client.email_sent = 1
+			client.save()
 
 	def validate_email_id(self, args):
 		if not args.email_id:
@@ -113,20 +111,21 @@ class ClientRFQ(Document):
 			)
 	
 	def rfq_mail(self, client, preview=False):
-		full_name = get_user_fullname(client.email_id) #### THS IS WRONG .. I WANT THE CLIENT CONTACT
+		client_email_id = client.get("email_id")
+		full_name = get_user_fullname(client_email_id)
 		if full_name == "Guest":
 			full_name = "Administrator"
 
 		doc_args = self.as_dict()
 
 		if client.get("contact"):
-			contact = frappe.get_doc("Contact", client.get("email_id"))
+			contact = frappe.get_doc("Contact", client_email_id)
 			doc_args["contact"] = contact.as_dict()
 
 		doc_args.update(
 			{
-				"vendor": client.get("vendor"),
-				"vendor_name": client.get("vendor_name"),
+				"vendor": self.get("vendor"),
+				"vendor_name": self.get("vendor_name"),
 				"contact_name": full_name,
 			}
 		)
@@ -137,18 +136,16 @@ class ClientRFQ(Document):
 		email_template = frappe.get_doc("Email Template", self.email_template)
 		message = frappe.render_template(email_template.response_, doc_args)
 		subject = frappe.render_template(email_template.subject, doc_args)
-		sender = frappe.session.user not in STANDARD_USERS and frappe.session.user or None
+		sender = "sales@kanban-group.com"
+	#	sender = frappe.session.user not in STANDARD_USERS and frappe.session.user or None
 
 		if preview:
 			return {"message": message, "subject": subject}
 
 		attachments = []
 		
-		if self.send_attached_files:
-			attachments = self.get_attachments()
-
 		if self.send_document_print:
-			supplier_language = frappe.db.get_value("Supplier", data.supplier, "language")
+			supplier_language = frappe.db.get_value("Customer", self.client, "language")
 			system_language = frappe.db.get_single_value("System Settings", "language")
 			attachments.append(
 				frappe.attach_print(
@@ -161,14 +158,10 @@ class ClientRFQ(Document):
 				)
 			)
 
-		print("############# Well we got this far !! #############")
-		print(client, sender, subject, message)
-		exit()
-
-		self.send_email(data, sender, subject, message, attachments)
+		self.send_email(client, sender, subject, message, attachments)
 
 	def send_email(self, data, sender, subject, message, attachments):
-		exit()
+
 		make(
 			subject=subject,
 			content=message,
@@ -180,7 +173,7 @@ class ClientRFQ(Document):
 			name=self.name,
 		)["name"]
 
-		frappe.msgprint(_("Email Sent to Supplier {0}").format(data.supplier))
+		frappe.msgprint(_("Email Sent to Client --- {0}").format(self.client))
 
 
 

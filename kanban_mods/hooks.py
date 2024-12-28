@@ -194,25 +194,33 @@ scheduler_events = {
             "frappe.utils.global_search.sync_global_search",
             "frappe.deferred_insert.save_to_db",
         ],
-        # 10 minutes
-        "0/2 * * * *": [
+
+        # every minute
+         "*/1 * * * *": [
+            "frappe.email.queue.flush",
             "frappe.email.doctype.email_account.email_account.pull",
         ],
+
+        # every 5 minutes
+         "*/5 * * * *": [
+ 		    "frappe.monitor.flush",
+		    "frappe.automation.doctype.reminder.reminder.send_reminders",
+      ],
+
         # Hourly but offset by 30 minutes
         "30 * * * *": [
             "frappe.core.doctype.prepared_report.prepared_report.expire_stalled_report",
         ],
+
         # Daily but offset by 45 minutes
         "45 0 * * *": [
             "frappe.core.doctype.log_settings.log_settings.run_log_clean_up",
         ],
     },
-#    "cron": [
-#        "0/3 * * * *": [
-#            "frappe.email.doctype.email_account.email_account.pull",
-#        ],
-#    ],
-# 	"all": [
+	"all": [
+	],
+
+#  	"all": [
 # 		"kanban_mods.tasks.all"
 # 	],
 # 	"daily": [
