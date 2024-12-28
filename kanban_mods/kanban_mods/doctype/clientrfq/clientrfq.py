@@ -136,8 +136,12 @@ class ClientRFQ(Document):
 		email_template = frappe.get_doc("Email Template", self.email_template)
 		message = frappe.render_template(email_template.response_, doc_args)
 		subject = frappe.render_template(email_template.subject, doc_args)
-		sender = "sales@kanban-group.com"
-	#	sender = frappe.session.user not in STANDARD_USERS and frappe.session.user or None
+		sender_list = frappe.get_all("Email Account", {"default_outgoing": 1}, "email_id")
+
+		if not sender_list or len(sender_list) != 1:
+			sender = "sales@kanban-group.com"
+		else:
+			sender = sender_list[0].email_id
 
 		if preview:
 			return {"message": message, "subject": subject}
