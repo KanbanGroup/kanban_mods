@@ -14,6 +14,8 @@ from frappe.utils.user import get_user_fullname
 from frappe.model.document import Document
 from frappe.contacts.address_and_contact import load_address_and_contact
 
+from kanban_mods.utils.misc_functions import dump
+
 form_grid_templates = {"items": "templates/form_grid/item_grid.html"}
 
 from datetime import date
@@ -80,6 +82,7 @@ class ClientRFQ(Document):
 			self.db_set("status", "Draft")
 
 	def on_submit(self):
+
 		self.db_set("status", "Submitted")
 		self.send_to_client()
 
@@ -147,7 +150,6 @@ class ClientRFQ(Document):
 			return {"message": message, "subject": subject}
 
 		attachments = []
-		
 		if self.send_document_print:
 			supplier_language = frappe.db.get_value("Customer", self.client, "language")
 			system_language = frappe.db.get_single_value("System Settings", "language")
@@ -221,3 +223,4 @@ def get_list(source_name):
 	)
 
 	return doclist
+

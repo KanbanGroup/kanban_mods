@@ -196,7 +196,7 @@ scheduler_events = {
         ],
 
         # every minute
-         "*/1 * * * *": [
+         "* * * * *": [
             "frappe.email.queue.flush",
             "frappe.email.doctype.email_account.email_account.pull",
         ],
