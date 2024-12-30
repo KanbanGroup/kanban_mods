@@ -59,8 +59,11 @@ class ClientRFQ(Document):
 		vendor: DF.Link 
 		doctype: DF.Link | "ClientRFQ"
 
+	def on_create(self):
+		self.set_initial_values();
+	
 	def set_initial_values(self):
-		self.email_template = "CustRFQ_Email"
+		self.email_template = "ClientRFQ_Email"
 		self.letter_head = "New_Kanban_Letterhead"
 		self.naming_series = "SAL-CRFQ-.YYYY.-"
 		self.send_attached_files = 0
