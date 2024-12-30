@@ -4,6 +4,7 @@
 import json
 
 import frappe
+import inspect
 from frappe import _
 from frappe.core.doctype.communication.email import make
 from frappe.desk.form.load import get_attachments
@@ -14,11 +15,10 @@ from frappe.utils.user import get_user_fullname
 from frappe.model.document import Document
 from frappe.contacts.address_and_contact import load_address_and_contact
 
-from kanban_mods.utils.misc_functions import dump
-
 form_grid_templates = {"items": "templates/form_grid/item_grid.html"}
 
 from datetime import date
+from kanban_mods.utils.misc_functions import dump
 
 STANDARD_USERS = ("Guest", "Administrator", "Customer")
 
@@ -63,8 +63,8 @@ class ClientRFQ(Document):
 		self.email_template = "CustRFQ_Email"
 		self.letter_head = "New_Kanban_Letterhead"
 		self.naming_series = "SAL-CRFQ-.YYYY.-"
-		self.send_attached_files = 1
-		self.send_document_print = 0
+		self.send_attached_files = 0
+		self.send_document_print = 1
 		self.status = "Draft"
 		self.transaction_date = date.today()
 		self.vendor = "Kanban-Group Bearings"
@@ -72,7 +72,7 @@ class ClientRFQ(Document):
 	def set_buyer_details(self, buyer):
 		self.company = buyer
 		self.billing_address = buyer.billing_address
-
+		
 	def validate(self):
 		# validate_for_items(self)
 		pass
@@ -80,9 +80,8 @@ class ClientRFQ(Document):
 		if self.docstatus < 1:
 			# after amend and save, status still shows as cancelled, until submit
 			self.db_set("status", "Draft")
-
+	
 	def on_submit(self):
-
 		self.db_set("status", "Submitted")
 		self.send_to_client()
 
@@ -223,4 +222,3 @@ def get_list(source_name):
 	)
 
 	return doclist
-
