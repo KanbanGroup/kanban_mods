@@ -39,5 +39,6 @@ def get_uom(item_code):
 def get_context(context):
 	# do your magic here
 	context.show_sidebar = True
+	context.show_list = 0
 
 
