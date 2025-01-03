@@ -1,6 +1,7 @@
 ## Kanban Mods
 
-Modifications and additions to Kanban-Group (Bearings) ERP system
+ERPnext Modifications to enable custom actios and doctypes
 
 #### License
+
 mit

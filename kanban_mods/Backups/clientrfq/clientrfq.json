@@ -1,15 +1,16 @@
 {
  "actions": [],
- "allow_auto_repeat": 1,
+ "allow_guest_to_view": 1,
  "allow_import": 1,
- "autoname": "naming_series:",
- "creation": "2024-12-24 09:55:43.121942",
+ "autoname": "naming_series:naming_series",
+ "creation": "2024-12-14 18:41:03.535981",
+ "default_view": "List",
  "doctype": "DocType",
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
-  "client",
+  "company",
   "billing_address",
   "billing_address_display",
   "vendor",
@@ -17,6 +18,7 @@
   "schedule_date",
   "status",
   "amended_from",
+  "items_section",
   "items",
   "email_template",
   "send_attached_files",
@@ -27,9 +29,9 @@
  ],
  "fields": [
   {
+   "default": "SAL-CRFQ-.YYYY.-",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "in_list_view": 1,
    "label": "Series",
    "no_copy": 1,
    "oldfieldname": "naming_series",
@@ -40,29 +42,35 @@
    "set_only_once": 1
   },
   {
-   "fetch_from": "client.primary_address",
-   "fieldname": "billing_address",
+   "fieldname": "company",
    "fieldtype": "Link",
-   "label": "Billing Address",
-   "options": "Address",
-   "print_width": "300px",
-   "read_only": 1
+   "in_list_view": 1,
+   "label": "Company",
+   "oldfieldname": "company",
+   "oldfieldtype": "Link",
+   "options": "Customer",
+   "print_hide": 1,
+   "remember_last_selected_value": 1,
+   "reqd": 1,
+   "search_index": 1
   },
   {
-   "columns": 2,
-   "fetch_from": "client.primary_address",
+   "fetch_from": "company.customer_primary_address",
+   "fieldname": "billing_address",
+   "fieldtype": "Link",
+   "label": "Company Billing Address",
+   "options": "Address"
+  },
+  {
    "fieldname": "billing_address_display",
-   "fieldtype": "Text",
+   "fieldtype": "Small Text",
    "label": "Billing Address Details",
-   "print_width": "300px",
-   "read_only": 1,
-   "width": "300px"
+   "read_only": 1
   },
   {
    "description": "For individual supplier",
    "fieldname": "vendor",
    "fieldtype": "Link",
-   "hidden": 1,
    "in_standard_filter": 1,
    "label": "Supplier",
    "no_copy": 1,
@@ -77,24 +85,23 @@
    "label": "Date",
    "oldfieldname": "transaction_date",
    "oldfieldtype": "Date",
-   "print_width": "100px",
    "reqd": 1,
    "search_index": 1
   },
   {
    "fieldname": "schedule_date",
    "fieldtype": "Date",
-   "label": "Required Date",
-   "print_width": "100px"
+   "label": "Required Date"
   },
   {
+   "default": "Draft",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
    "no_copy": 1,
    "oldfieldname": "status",
    "oldfieldtype": "Select",
-   "options": "\nDraft\nSubmitted\nCancelled",
+   "options": "Draft\nSubmitted\nCancelled",
    "print_hide": 1,
    "read_only": 1,
    "reqd": 1,
@@ -115,11 +122,10 @@
    "label": "Items",
    "oldfieldname": "po_details",
    "oldfieldtype": "Table",
-   "options": "ClientRFQ Item",
+   "options": "ClientRFQ_Item",
    "reqd": 1
   },
   {
-   "default": "ClientRFQ_Email",
    "fieldname": "email_template",
    "fieldtype": "Link",
    "label": "Email Template",
@@ -127,24 +133,25 @@
    "print_hide": 1
   },
   {
-   "default": "0",
-   "description": "If enabled, all files attached to this document will be attached to each email",
-   "fieldname": "send_attached_files",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Send Attached Files",
-   "print_hide": 1,
-   "read_only": 1
+   "depends_on": "eval:!doc.docstatus==1",
+   "fieldname": "preview",
+   "fieldtype": "Button",
+   "label": "Preview Email"
   },
   {
    "default": "1",
+   "description": "If enabled, all files attached to this document will be attached to each email",
+   "fieldname": "send_attached_files",
+   "fieldtype": "Check",
+   "label": "Send Attached Files"
+  },
+  {
+   "default": "0",
    "description": "If enabled, a print of this document will be attached to each email",
    "fieldname": "send_document_print",
    "fieldtype": "Check",
-   "hidden": 1,
    "label": "Send Document Print",
-   "print_hide": 1,
-   "read_only": 1
+   "print_hide": 1
   },
   {
    "allow_on_submit": 1,
@@ -152,7 +159,6 @@
    "fetch_if_empty": 1,
    "fieldname": "message_for_supplier",
    "fieldtype": "Text Editor",
-   "in_list_view": 1,
    "label": "Message for Supplier",
    "print_hide": 1
   },
@@ -170,6 +176,7 @@
   },
   {
    "allow_on_submit": 1,
+   "default": "New_Kanban_Letterhead",
    "fieldname": "letter_head",
    "fieldtype": "Link",
    "label": "Letter Head",
@@ -178,25 +185,11 @@
    "options": "Letter Head",
    "print_hide": 1
   },
-  {
-   "fieldname": "client",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Client",
-   "oldfieldname": "company",
-   "oldfieldtype": "Link",
-   "options": "Customer",
-   "print_width": "300px",
-   "remember_last_selected_value": 1,
-   "reqd": 1,
-   "search_index": 1
-  }
  ],
  "icon": "fa fa-shopping-cart",
- "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-28 19:50:22.327698",
+ "modified": "2024-12-22 11:50:47.208238",
  "modified_by": "Administrator",
  "module": "Kanban Mods",
  "name": "ClientRFQ",
@@ -213,44 +206,51 @@
    "read": 1,
    "report": 1,
    "role": "Sales Master Manager",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1
   },
   {
+    "amend": 1,
+    "cancel": 1,
+    "create": 1,
+    "delete": 1,
+    "email": 1,
+    "print": 1,
+    "read": 1,
+    "report": 1,
+    "role": "Sales Manager",
+    "select": 1,
+    "share": 1,
+    "submit": 1,
+    "write": 1
+   },
+   {
+    "amend": 1,
+    "cancel": 1,
+    "create": 1,
+    "delete": 1,
+    "email": 1,
+    "print": 1,
+    "read": 1,
+    "report": 1,
+    "role": "Sales User",
+    "select": 1,
+    "share": 1,
+    "submit": 1,
+    "write": 1
+   },
+    {
    "amend": 1,
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Sales Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "amend": 1,
-   "create": 1,
-   "email": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Sales User",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
    "create": 1,
    "email": 1,
    "print": 1,
    "read": 1,
    "report": 1,
    "role": "Customer",
-   "submit": 1,
+   "select": 1,
+   "share": 1,
    "write": 1
   }
  ],
@@ -258,22 +258,6 @@
  "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [
-  {
-   "color": "Orange",
-   "title": "Draft"
-  },
-  {
-   "color": "Blue",
-   "title": "Submitted"
-  },
-  {
-   "color": "Green",
-   "title": "Accepted"
-  },
-  {
-   "color": "Gray",
-   "title": "Rejected"
-  }
- ]
+ "states": [],
+ "track_changes": 1
 }

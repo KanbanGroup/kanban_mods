@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class ClientRFQItem(Document):
+class ClientRFQ_Item(Document):
 	pass

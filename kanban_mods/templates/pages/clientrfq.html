@@ -1,0 +1,174 @@
+
+{% extends "templates/web.html" %}
+
+{% block breadcrumbs %}
+	{% include "templates/includes/breadcrumbs.html" %}
+{% endblock %}
+
+{% block title %}
+	{{ doc.name }}
+{% endblock %}
+
+{% block header %}
+	<h3 class="m-0">{{ doc.name }}</h3>
+{% endblock %}
+
+{% block header_actions %}
+	<div class="row">
+		<div class="dropdown">
+			<button class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+				<span class="font-md">{{ _('Actions') }}</span>
+				<b class="caret"></b>
+			</button>
+			<ul class="dropdown-menu dropdown-menu-right" style = "color: white; background-color: black;" role="menu">
+				{% if doc.doctype == 'Purchase Order' and show_make_pi_button %}
+					<a class="dropdown-item"
+						href="/api/method/erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_invoice_from_portal?purchase_order_name={{ doc.name }}"
+						data-action="make_purchase_invoice">{{ _("Make Purchase Invoice") }}
+					</a>
+				{% endif %}
+				<a class="btn btn-primary btn-sm"
+					href='/printview?doctype={{ doc.doctype}}&name={{ doc.name }}&format={{ print_format }}' target="_blank"
+						rel="noopener noreferrer">
+					{{ _("Print") }}
+				</a>
+				{% if show_pay_button %}
+					<div class="form-column col-sm-6">
+						<div class="page-header-actions-block" data-html-block="header-actions">
+							<p>
+								<a href="/api/method/erpnext.accounts.doctype.payment_request.payment_request.make_payment_request?dn={{ doc.name }}&dt={{ doc.doctype }}&submit_doc=1&order_type=Shopping Cart"
+									class="btn btn-primary btn-sm" id="pay-for-order">
+									{{ _("Pay") }} {{doc.get_formatted("grand_total") }}
+								</a>
+							</p>
+						</div>
+					</div>
+				{% endif %}
+				{%  if doc.doctype == 'Quotation' and (doc.status == "Open")  %}
+					<div class="form-column col-sm-6">
+						<div class="page-header-actions-block" data-html-block="header-actions">
+							<p>
+								<a href="/api/method/kanban_mods.selling.doctype.quotation.quotation.make_sales_order_from_portal?source_name={{ doc.name }}"
+									class="btn btn-primary btn-sm" id="accept-quotation">
+										{{ _("Accept") }}
+								</a>
+							</p>
+						</div>
+					</div>
+				{% endif %}
+			</ul>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block page_content %}
+	<div>
+		<div class="row transaction-subheading  mt-1">
+			<div class="col-6 text-muted strong mt-1">
+				{{ _("Request Date") }}: 
+                  <h6>{{ frappe.utils.format_date(doc.transaction_date, 'medium') }}</h6>
+				{% if doc.schedule_date %}
+					{{ _("Required By") }}: 
+                       <H6>{{ frappe.utils.format_date(doc.schedule_date, 'medium') }}</H6>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="row indicator-container mt-2">
+			<div class="col-5">
+                {% if doc.status == "Draft" -%}
+                    {% set status_colour = "orange" -%}
+                {% elif doc.status == "Submitted" -%}
+                    {% set status_colour = "green" -%}
+                {% else -%}
+                    {% set status_colour = "gray" -%}
+                {% endif %}
+                <span class="indicator-pill {{ status_colour }}">
+                    {{ doc.status }}
+				</span>
+			</div>
+			<div class="text-right col-5">
+				{%- set party_name = frappe.db.get_value('Address', doc.billing_address, ['address_title']) %}
+				<b>{{ party_name }}</b><br />
+                {%- set address1 = frappe.db.get_value('Address', doc.billing_address, ['address_line1']) %}
+                {%- set address2 = frappe.db.get_value('Address', doc.billing_address, ['address_line2']) %}
+                {%- set pincode  = frappe.db.get_value('Address', doc.billing_address, ['pincode'])       %}
+                {%- set city     = frappe.db.get_value('Address', doc.billing_address, ['city'])          %}
+                {%- set country  = frappe.db.get_value('Address', doc.billing_address, ['country'])       %}
+
+
+                {{ address1 }}<br />
+                {% if address2 -%} {{ address2 }}<br /> {% endif %}
+                {% if pincode -%} {{ pincode }},&nbsp;&nbsp; {%endif %}
+                {% if city -%} {{ city }}<br /> {% endif %}
+                {% if country -%} {{ country }}<br /> {% endif %}           
+
+				{% if doc.contact_display and doc.contact_display != party_name %}
+					<br>
+					{{ doc.contact_display }}<br />
+				{% endif %}
+			</div>
+		</div>
+
+		{% if doc._header %}
+			{{ doc._header }}
+		{% endif %}
+	</div>
+
+    <div class="order-container mt-4">
+			<div class="w-100">
+				<div class="order-items order-item-header mb-1 row text-muted">
+					<span class="col-2">
+						<h6>{{ _("Item Group") }}</h6>
+					</span>
+					<span class="col-5">
+						<h6>{{ _("Item Code") }}</h6>
+					</span>
+					<span class="d-s-n col-3">
+						<h6>{{ _("Quantity") }}</h6>
+					</span>
+				</div>
+				{% for d in doc.items %}
+				<div class="order-items row align-items-center">
+					<span class="order-item-group col-2 pr-0">
+                    {{ d.item_group }}		
+					</span>
+                    <span class="order-item-code col-5 pr-0">
+                        {{ d.item_code }}		
+                    </span>
+                     <span class="d-s-n col-3 pl-10">
+						{{ d.get_formatted("qty") }}
+					</span>
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+
+	{% if attachments %}
+		<div class="order-item-table">
+			<div class="row order-items order-item-header text-muted">
+				<div class="col-sm-12 h6 text-uppercase">
+					{{ _("Attachments") }}
+				</div>
+			</div>
+			<div class="row order-items">
+				<div class="col-sm-12">
+					{% for attachment in attachments %}
+					<p class="small">
+						<a href="{{ attachment.file_url }}" target="blank"> {{ attachment.file_name }} </a>
+					</p>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	{% endif %}
+
+	{% if doc.terms %}
+		<div class="terms-and-condition text-muted small">
+			<hr>
+			<p>{{ doc.terms }}</p>
+		</div>
+	{% endif %}
+
+{% endblock %}
