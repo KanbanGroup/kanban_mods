@@ -26,12 +26,13 @@ def update_prices(doctype, item_code, new_price):
         else:
             item = frappe.get_doc("Item", item_code) # the actual item itself
             new_price = float(new_price)
-            zzz_update_buying_price(doctype, item_code, new_price, item) 
-            zzz_update_selling_price(doctype, item_code, new_price, item)
+            update_buying_price(doctype, item_code, new_price, item) 
+            update_selling_price(doctype, item_code, new_price, item)
+            raise Exception("Kevin poked me ... GRRRR")
+            return "Success"
     except Exception as ex:
         return ex
-    else:
-        return "Success"
+        
 
 ##### The  next two functions are the primary actions #######
 
