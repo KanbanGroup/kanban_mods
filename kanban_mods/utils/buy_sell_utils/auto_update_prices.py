@@ -28,7 +28,6 @@ def update_prices(doctype, item_code, new_price):
             new_price = float(new_price)
             update_buying_price(doctype, item_code, new_price, item) 
             update_selling_price(doctype, item_code, new_price, item)
-            raise Exception("Kevin poked me ... GRRRR")
             return "Success"
     except Exception as ex:
         return ex
