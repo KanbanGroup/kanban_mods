@@ -11,7 +11,7 @@ from kanban_mods.utils.misc_functions import dump
 
 @frappe.whitelist() 
 def update_prices(doctype, item_code, new_price): 
-    try:
+#    try:
         if item_code == "Shipping":
             # shipping is always variable for every order so we dont want 
             # to update the cost because we don't want it to pop up on
@@ -22,19 +22,17 @@ def update_prices(doctype, item_code, new_price):
             # Directly from the relevat Supplier Quotation ... 
             # 
             # That will probably be the next project.
-            return "Success"
-        
-        item = frappe.get_doc("Item", item_code) # the actual item itself
-        new_price = float(new_price)
-        zzz_update_buying_price(doctype, item_code, new_price, item) 
-        zzz_update_selling_price(doctype, item_code, new_price, item)
-
-    except Exception as ex:
-        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-        message = template.format(type(ex).__name__, ex.args)
-        return message
-    finally:
-        return "Success"
+            return "failure"
+        else:
+            item = frappe.get_doc("Item", item_code) # the actual item itself
+            new_price = float(new_price)
+            zzz_update_buying_price(doctype, item_code, new_price, item) 
+            zzz_update_selling_price(doctype, item_code, new_price, item)
+            return "failure"
+#    except Exception as ex:
+#        return ex
+#   finally:
+#        return "Success"
 
 ##### The primary functions are the next two #######
 
