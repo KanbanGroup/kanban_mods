@@ -8,7 +8,7 @@ from frappe.utils.user import is_website_user
 from frappe.utils.user import get_user_fullname
 
 from kanban_mods.utils.misc_functions import dump
-from kanban_mods.kanban_mods.controllers import website_list_for_clientrfc as wl
+from kanban_mods.kanban_mods.controllers import website_list_for_clientrfq as wl
 
 @frappe.whitelist() 
 def set_default_values(): 

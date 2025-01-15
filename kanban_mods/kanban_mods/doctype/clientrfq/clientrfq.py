@@ -87,7 +87,8 @@ class ClientRFQ(Document):
 	def on_submit(self):
 		self.db_set("status", "Submitted")
 		self.send_to_client()
-
+		self.create_supplier_RFQ()
+		
 	def get_link(self):
 		# RFQ link for suppliecustomerr portal
 		route = frappe.db.get_value(
@@ -183,8 +184,36 @@ class ClientRFQ(Document):
 
 		frappe.msgprint(_("Email Sent to Client --- {0}").format(self.client))
 
+	def create_supplier_RFQ(self):
+		#########################################################
+		# Since we are a drop shipping company, the faster we can 
+		# get the Client RFQ processed the better. So ...
+		#
+		# This method automatically creates a draft supplier RFQ
+		# Ready to be checked, updated and submitted by the staff
+		#########################################################
+
+		supplierRFQ = frappe.new_doc("Request for Quotation")
+		# what is the minimum amount of data to be set up
+		supplierRFQ.items = self.items
+		supplierRFQ.naming_series = "PUR-RFQ-.YYYY.-"
+		supplierRFQ.company = "Kanban-Group Bearings"
+		supplierRFQ.billing_address = "Kanban-Group Bearings-Office"
+		supplierRFQ.transaction_date = self.transaction_date
+		supplierRFQ.schedule_date = self.schedule_date
+		supplierRFQ.status = "Draft"
+		supplierRFQ.email_template = "RFQ Email"
+		supplierRFQ.send_attached_files = 0
+		supplierRFQ.send_document_print = 1
+		supplierRFQ.letter_head = "New_Kanban_Letterhead"
+		supplierRFQ.items = create_item_list(self.items, self.schedule_date)
+		supplierRFQ.suppliers = create_supplier_list()
+		supplierRFQ.insert(ignore_permissions=True)
 
 
+#############################################################
+# End of the class itself .... the rest are utility methods #
+#############################################################
 
 def get_context(context):
 	clientrfq_name = frappe.form_dict.name
@@ -193,7 +222,7 @@ def get_context(context):
 
 def get_list_context(context=None):
 
-	from kanban_mods.kanban_mods.controllers.website_list_for_clientrfc import get_list_context
+	from kanban_mods.kanban_mods.controllers.website_list_for_clientrfq import get_list_context
 	list_context = get_list_context(context)
 	list_context.update(
 		{
@@ -225,3 +254,83 @@ def get_list(source_name):
 	)
 
 	return doclist
+
+def create_item_list(items, req_date):
+	new_items = []
+	has_shipping = 0
+	for it in items:
+		#	check if there is an item with ID Shipping
+		if it.item_code == "Shipping":
+			has_shipping = 1
+
+		# now make the Supplier RFQ Item list
+		item = frappe.new_doc("Request for Quotation Item")
+
+		item.item_code = it.item_code
+		item.item_name = it.item_code
+		item.schedule_date = req_date
+		item.description = it.description
+		item.item_group = it.item_group
+		item.qty = it.qty
+		item.stock_uom = it.uom
+		item.uom = it.uom
+		item.conversion_factor = 1
+		item.stock_qty = it.qty
+		item.warehouse = "Customer Direct Delivery - KB"
+
+		new_items.append(item)
+
+	if not has_shipping:
+		new_items.append(create_shipping_item(req_date))
+
+	return new_items
+	
+
+def create_supplier_list():
+	# we always assume all suppliers shoud be offered the 
+	# option to quote ... but even if this assumption is 
+	# wrong, the buyer will be ablw to amend the list before 
+	# submitting the document. so ....
+
+	# get all the suppliers
+	sup_list = frappe.get_all("Supplier",
+						   fields=[
+							   "name",
+							   "supplier_primary_contact",
+							   "supplier_name",
+							   "email_id"
+							]
+						)
+	suppliers = []
+	# Add each supplier to the list
+	for sup in sup_list:
+		supplier = frappe.new_doc("Request for Quotation Supplier")
+		supplier.supplier = sup.name
+		supplier.contact = sup.supplier_primary_contact
+		supplier.quote_status = "Pending"
+		supplier.supplier_name = sup.supplier_name
+		supplier.email_id = sup.email_id
+		supplier.send_email = 1
+		supplier.email_sent = 0
+		suppliers.append(supplier)
+
+	return suppliers
+
+
+def create_shipping_item(req_date):
+
+	ship_item = frappe.new_doc("Request for Quotation Item")
+	ship_item.item_code = "Shipping"
+	ship_item.item_name = "Shipping"
+	ship_item.schedule_date = req_date
+	ship_item.description = "Shipping"
+	ship_item.item_group = "Transport"
+	ship_item.qty = 1
+	ship_item.stock_uom = "pkg"
+	ship_item.uom = "pkg"
+	ship_item.conversion_factor = 1
+	ship_item.stock_qty = 1
+	ship_item.warehouse = "Customer Direct Delivery - KB"
+
+	return ship_item
+

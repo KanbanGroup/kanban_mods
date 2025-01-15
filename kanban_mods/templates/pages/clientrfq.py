@@ -1,7 +1,7 @@
 
 import frappe
 from frappe import _
-from kanban_mods.kanban_mods.controllers.website_list_for_clientrfc import get_doc
+from kanban_mods.kanban_mods.controllers.website_list_for_clientrfq import get_doc
 
 def get_context(context):
 	context.no_cache = 1
