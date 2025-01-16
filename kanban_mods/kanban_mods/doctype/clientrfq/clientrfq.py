@@ -5,6 +5,9 @@ import json
 
 import frappe
 import inspect
+import traceback
+import html
+
 from frappe import _
 from frappe.core.doctype.communication.email import make
 from frappe.desk.form.load import get_attachments
@@ -19,7 +22,7 @@ form_grid_templates = {"items": "templates/form_grid/item_grid.html"}
 
 from datetime import date
 from kanban_mods.utils.misc_functions import dump
-
+from kanban_mods.utils.misc_functions import Support_mail
 STANDARD_USERS = ("Guest", "Administrator", "Customer")
 
 class ClientRFQ(Document):
@@ -60,7 +63,7 @@ class ClientRFQ(Document):
 		doctype: DF.Link | "ClientRFQ"
 
 	def on_create(self):
-		self.set_initial_values();
+		self.set_initial_values()
 	
 	def set_initial_values(self):
 		self.email_template = "ClientRFQ_Email"
@@ -193,22 +196,66 @@ class ClientRFQ(Document):
 		# Ready to be checked, updated and submitted by the staff
 		#########################################################
 
-		supplierRFQ = frappe.new_doc("Request for Quotation")
-		# what is the minimum amount of data to be set up
-		supplierRFQ.items = self.items
-		supplierRFQ.naming_series = "PUR-RFQ-.YYYY.-"
-		supplierRFQ.company = "Kanban-Group Bearings"
-		supplierRFQ.billing_address = "Kanban-Group Bearings-Office"
-		supplierRFQ.transaction_date = self.transaction_date
-		supplierRFQ.schedule_date = self.schedule_date
-		supplierRFQ.status = "Draft"
-		supplierRFQ.email_template = "RFQ Email"
-		supplierRFQ.send_attached_files = 0
-		supplierRFQ.send_document_print = 1
-		supplierRFQ.letter_head = "New_Kanban_Letterhead"
-		supplierRFQ.items = create_item_list(self.items, self.schedule_date)
-		supplierRFQ.suppliers = create_supplier_list()
-		supplierRFQ.insert(ignore_permissions=True)
+		# Let the user know what you are doing. We can pop all 
+		# messages up on the working screen because these actions
+		# follows a submit, and only staff can do the submnit 
+		# action dcirectly from the app screen ...
+
+		frappe.msgprint(
+			title='Client RFQ Successfully Submitted',
+			msg = 'Now creating the corresponding Supplier RFQ automatically</br />' +
+				  'You will be able to review/edit/submit it when this process completes.',
+			indicator = 'green'
+		)
+
+		try: 
+			supplierRFQ = frappe.new_doc("Request for Quotation")
+			# what is the minimum amount of data to be set up
+			supplierRFQ.items = self.items
+			supplierRFQ.naming_series = "PUR-RFQ-.YYYY.-"
+			supplierRFQ.company = "Kanban-Group Bearings"
+			supplierRFQ.billing_address = "Kanban-Group Bearings-Office"
+			supplierRFQ.transaction_date = self.transaction_date
+			supplierRFQ.schedule_date = self.schedule_date
+			supplierRFQ.status = "Draft"
+			supplierRFQ.email_template = "RFQ Email"
+			supplierRFQ.send_attached_files = 0
+			supplierRFQ.send_document_print = 1
+			supplierRFQ.letter_head = "New_Kanban_Letterhead"
+			supplierRFQ.items = create_item_list(self.items, self.schedule_date)
+			supplierRFQ.suppliers = create_supplier_list()
+			supplierRFQ.insert(ignore_permissions=True)
+
+		except Exception as e:
+			# Notify the problem to the staff ... 
+			frappe.msgprint(
+				title = 'Error creating Supplier RFQ from Client RFQ - ' + self.name,
+				msg = 'There was a system error during the creation of the supplier RFQ. This does not ' +
+				 	  'affect the processing of the Client RFQ, but it does mean that you will have to ' + 
+					  'create the Supplier RFQ manually.<br /><br />' +
+					  'It would be very useful if you could call Kevin and tell him what has happened.',
+				indicator = 'red'
+			)
+			# and send kevin a copy of the error traceback etc. (*** LATER ***)
+			# this has to ne the most kludgy work around I've enver tasted !!!
+			em_adrs = Support_mail()
+			self.send_email(  data = em_adrs,
+							  sender = em_adrs.sender,
+							  subject = "Error creating supplier RFQ", 
+							  message = "There was a system error during the creation of a supplier RFQ " +
+							  "based on Client RFQ # " + self.name + ". Please attend to it asap.<br /><br />" +
+							  "the exception report is below.<br /><br />" + 
+							  "<pre>" + traceback.format_exc() + "</pre>",
+							  attachments = []
+							)
+		else:
+			# notify the staff that a Supplier RFQ has been auto-created
+			frappe.msgprint(
+				title = 'Draft Supplier RFQ ' + supplierRFQ.name+ ' Created',
+				msg = 'You can now review it, edit it if necessary, and then submit it to the suppliers',
+				indicator = 'green'
+			)
+
 
 
 #############################################################

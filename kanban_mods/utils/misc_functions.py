@@ -45,3 +45,13 @@ def dump(obj, indent=0, itemcount = 0):
 	else: 
 		print(' ' * indent + str(obj))
 	
+
+class Support_mail():
+	# I am forced to set up thos sort of stuff because of the way Frappe uses
+	# class objects for most things ... It's kust a repository for certain 
+	# variables which can be used to send pro-forma mails. I may create more
+	# for different purposes - e.g. sales
+
+	def __init__(self):
+		self.email_id = "kevin@kanban-group.com"
+		self.sender   = "noreply@kanban-group.com"
