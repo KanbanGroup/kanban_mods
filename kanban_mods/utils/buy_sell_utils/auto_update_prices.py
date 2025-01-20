@@ -17,11 +17,6 @@ def update_prices(doctype, item_code, new_price):
             # to update the cost because we don't want it to pop up on
             # future quotations. 
             #
-            # TODO I might revisit this when I look at Sales Quotations.
-            # in fact, I want to be able to create a Draft Sales Quotation
-            # Directly from the relevat Supplier Quotation ... 
-            # 
-            # That will probably be the next project.
             return "Success"
         else:
             item = frappe.get_doc("Item", item_code) # the actual item itself
