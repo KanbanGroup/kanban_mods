@@ -4,9 +4,9 @@ ERPnext Modifications to enable custom actions and doctypes
 
 Phase 0 - add some site specific formatting
 
-Phase 1 - include a Client RFQ web form - Done
+Phase 1 - Include a Client RFQ doctype and web form - Done
 
-Phase 2 - Updare price lists from suplier quotation - Done
+Phase 2 - Update price lists from supplier quotation - Done
 
 Phase 3 - Create properly priced quotation from supplier quotation - Done
 
