@@ -9,9 +9,9 @@
 # we need to add a function to correct the prices before it hits#
 # the screen, so as not to cause confusion.                     #
 #################################################################
-# Author: Kevin Salt
-# Last modified 21/01/2025
-# See also: hooks.py - override_whitelisted_methods
+# Author: Kevin Salt                                            #
+# Last modified 22/01/2025                                      #
+# See also: hooks.py - override_whitelisted_methods             #
 #################################################################
 
 import frappe
@@ -47,23 +47,28 @@ def custom_make_quotation(source_name, target_doc=None):
 
 def set_sales_item_prices(doc):
 	for item in doc.items:
-		dump(item)
+		if not item.item_group == "Transport":
+			# find the actual selling price from Item Price
+			sp = fetch_price(item.item_code)
+			total = sp * item.qty
+			# Populate the price entries with that value
+			item.price_list_rate = sp
+			item.base_price_list_rate = sp
+			item.rate = sp
+			item.net_rate = sp
+			item.base_rate = sp
+			item.base_net_rate = sp
+			# populate the ammount with the new calculatd value
+			item.amount = total
+			item.net_amount = total
+			item.base_amount = total
+			item.base_net_amount = total
+			# clear the discounts
+			item.discount_percentage = 0
+			item.discount_amount = 0
 
-''' 
-This is the stuff I need to sort out
-
-     item_code: 02872/2/02820/2/Q
-	 price_list_rate: 100.0
-     base_price_list_rate: 100.0
-      discount_percentage: 0
-     discount_amount: 0
-     rate: 200.0
-     net_rate: 200.0
-     amount: 20000.0
-     net_amount: 20000.0
-     base_rate: 200.0
-     base_net_rate: 200.0
-     base_amount: 20000.0
-     base_net_amount: 20000.0
-	 
-'''
+def fetch_price(item_code): 
+	selling_record = frappe.get_doc("Item Price",
+									{'item_code': item_code, 'selling': True}
+									) 
+	return selling_record.price_list_rate
