@@ -165,9 +165,9 @@ website_route_rules = [
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_whitelisted_methods = {
+	"erpnext.buying.doctype.supplier_quotation.supplier_quotation.make_quotation": "kanban_mods.kanban_mods.overrides.supplier_quotation.custom_make_quotation"
+ }
 
 # Document Events
 # ---------------

@@ -86,26 +86,3 @@ def get_selling_price(price, item):
     print("New Selling Price = ",new_s_p)
     return new_s_p
 
-#################################################################
-# There is an issue with the auto create of a quotation via the #
-# supplier quotation "Create From" button. The "rate" used in a #
-# supplier quotation is automatically used to populate the sales#
-# quotation, which results in a "first look" filled with errors #
-# in the item pricing.                                          #
-#                                                               #
-# Because of our automated process of updating the price lists, #
-# we need to add a function to correct the prices before it hits#
-# the screen, so as not to cause confusion.                     #
-#################################################################
-#                  revise_auto_quotation(doc)
-# Parameters:
-#   doc: doctype Quotation
-# returns:
-#   doc. It also saves the document
-#
-# Author: Kevin Salt
-# Last modified 21/01/2025
-#################################################################
-
-def revise_auto_quotation(doc):
-    pass
