@@ -53,7 +53,7 @@ def update_selling_price(doctype, item_code, price, item):
 def create_item_price(doctype, item_code, price_list, price, item):
     # Populate and save a new item_price record. The type of 
     # record is determined by the price list in use
-    selling = (price_list == "Selling")  
+    selling = price_list.endswith("Selling")
     buying  = not selling
 
     new_item_price = frappe.get_doc({'doctype':       doctype, 
@@ -83,6 +83,5 @@ def get_selling_price(price, item):
         new_s_p = price * (1 + margin/100)
     else:
         new_s_p= price + margin
-    print("New Selling Price = ",new_s_p)
     return new_s_p
 
