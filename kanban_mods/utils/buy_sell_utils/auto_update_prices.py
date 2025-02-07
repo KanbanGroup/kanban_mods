@@ -16,7 +16,7 @@ from datetime import date
 from kanban_mods.utils.misc_functions import dump
 
 @frappe.whitelist() 
-def update_prices(doctype, item_code, new_price): 
+def update_prices_from_quotation(doctype, item_code, new_price): 
     try:
         if item_code == "Shipping":
             # shipping is always variable for every order so we dont want 
@@ -28,7 +28,8 @@ def update_prices(doctype, item_code, new_price):
             item = frappe.get_doc("Item", item_code) # the actual item itself
             new_price = float(new_price)
             update_buying_price(doctype, item_code, new_price, item) 
-#            update_selling_price(doctype, item_code, new_price, item)
+            sell_price = get_selling_price(new_price, item)
+            update_selling_price(doctype, item_code, sell_price, item)
             return "Success"
     except Exception as ex:
         return ex
@@ -86,7 +87,7 @@ def get_selling_price(price, item):
     margin_type = rule.margin_type
     # uplift the buying price to the sales "list price" and apply it
     # We always work with fixed percentages, but I added the redundant
-    # case in case we ever meed it
+    # case in case we ever need it
     if margin_type == "Percentage":
         new_s_p = price * (1 + margin/100)
     else:
@@ -133,13 +134,14 @@ def bulk_update_from_xls(file_name):
             # So we don't need to mess around working out which column holds
             # which values - Item_name, Buying Price, Selling Price (optional)
             item_code = row[0]
+            item = frappe.db.get_value("Item", item_code, ["item_name", "stock_uom", "brand", "item_group"], as_dict=1)
             bp = float(row[1])
-            if len(row) > 2: 
+            if len(row) > 2 and row[2] != None and row[2] != 0 and row[2] < bp: 
                 sp = float(row[2])
             else:
-                sp = bp
+                sp = float(get_selling_price(bp, item))
+
             print(item_code, bp, sp)
-            item = frappe.db.get_value("Item", item_code, ["item_name", "stock_uom", "brand", "item_group"], as_dict=1)
             update_buying_price("Item Price", item_code, bp, item)
             update_selling_price("Item Price", item_code, sp, item)
             
