@@ -64,4 +64,4 @@ def add_manufacturer_suffix(manufacturer = None):
         frappe.db.commit()
         return "Its all ready for checking" 
     else:
-        return "You need to provide a manufacturer ID like SKF oe GENERIC"
+        return "You need to provide a manufacturer ID like SKF or NEUTRAL"
