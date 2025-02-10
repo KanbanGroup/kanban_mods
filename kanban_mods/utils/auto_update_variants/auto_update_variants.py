@@ -58,10 +58,10 @@ def add_manufacturer_suffix(manufacturer = None):
             ix += 1
             print(ix2," -- ",ix)
             if ix == 100:
-                frappe.db.commit()
+                frappe.db.commit() 
                 ix = 0
                 ix2 += 100
-                
+        frappe.db.commit()
         return "Its all ready for checking" 
     else:
         return "You need to provide a manufacturer ID like SKF oe GENERIC"
