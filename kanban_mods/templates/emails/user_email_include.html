@@ -1,5 +1,5 @@
-<p>Dear {{ contact_name }}<br /></p>
-
+<p>Dear {{ uname }}</p>
+<br />
 <p>
     {{ d_title }} {{ name }} is now online.
     <br /><br />
@@ -10,15 +10,11 @@
     <br /><br />
     The Kanban Team
 </p>
-
+<br />
 <p>
     If the "Log in" link above does not work please copy and paste this link into your browser
 </p>
-
 <br /><br />
-
 <b>{{target }}</b>
-
 <br /><br />
-
 <div align=center>{{ frappe.render_template('templates/includes/footer/footer_powered.html', {}) }}</div>
