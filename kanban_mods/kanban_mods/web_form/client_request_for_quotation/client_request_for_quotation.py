@@ -26,6 +26,7 @@ def set_default_values():
 		retval[f'billing_address'] = customer.customer_primary_address
 		retval[f'billing_address_display'] = customer.primary_address
 		retval[f'permitted'] = True
+		retval[f'from_portal'] = True
 	else:
 		retval[f'permitted'] = False
 	return retval

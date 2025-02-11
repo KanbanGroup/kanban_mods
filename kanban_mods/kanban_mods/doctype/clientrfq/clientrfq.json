@@ -23,7 +23,8 @@
   "send_document_print",
   "message_for_supplier",
   "select_print_heading",
-  "letter_head"
+  "letter_head",
+  "from_portal"
  ],
  "fields": [
   {
@@ -190,13 +191,21 @@
    "remember_last_selected_value": 1,
    "reqd": 1,
    "search_index": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "from_portal",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "From Portal",
+   "print_hide": 1
   }
  ],
  "icon": "fa fa-shopping-cart",
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-28 19:50:22.327698",
+ "modified": "2025-02-11 09:24:47.379878",
  "modified_by": "Administrator",
  "module": "Kanban Mods",
  "name": "ClientRFQ",
