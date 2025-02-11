@@ -1,10 +1,9 @@
 <p>Dear {{ uname }}</p>
 <br />
 <p>
-    {{ d_title }} {{ name }} is now online.
-    <br /><br />
-    Please <A href={{ target }}>Log In</a> to our customer portal in order to review it.
-    For convenience, we have also attached a PDF of the {{ d_desc }} to this mail.
+    {{ d_title }} {{ name }} is now online. Please <A href={{ target }}>Log In</a> 
+    to our customer portal in order to review it. For convenience, we have also
+    attached a PDF of the {{ d_desc }} to this mail.
     <br /><br />
     We look forward to hearing from you soon.
     <br /><br />
@@ -12,9 +11,9 @@
 </p>
 <br />
 <p>
-    If the "Log in" link above does not work please copy and paste this link into your browser
+    If the "Log in" link above does not work please copy and paste this link into your browser - <br />
+    <b>{{target }}</b>
 </p>
-<br /><br />
-<b>{{target }}</b>
-<br /><br />
-<div align=center>{{ frappe.render_template('templates/includes/footer/footer_powered.html', {}) }}</div>
+
+<br /><br /><br />
+{{ frappe.render_template('templates/includes/footer/footer_powered.html', {}) }}
